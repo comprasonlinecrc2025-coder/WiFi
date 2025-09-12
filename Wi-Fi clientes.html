@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Acesso Wi-Fi</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #f4f6f8;
+      margin: 0;
+    }
+    .card {
+      background: #fff;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 350px;
+      text-align: center;
+    }
+    input {
+      width: 100%;
+      padding: 0.8rem;
+      margin: 1rem 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 0.8rem 1.2rem;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      width: 100%;
+    }
+    button:hover { background: #0056b3; }
+    small { color: #666; font-size: 0.8rem; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Bem-vindo ao Wi-Fi</h2>
+    <p>Digite seu CPF para acessar a internet.</p>
+    <form id="f">
+      <input id="cpf" type="text" placeholder="000.000.000-00" required>
+      <button type="submit">Entrar</button>
+    </form>
+    <small>Ao continuar, você concorda com o uso de seus dados para controle de acesso.</small>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyDH1B9NAXby6EzwLhsMYkZWnYFWeLpUk1A",
+      authDomain: "wifi-clientes-acaa1.firebaseapp.com",
+      databaseURL: "https://wifi-clientes-acaa1-default-rtdb.firebaseio.com",
+      projectId: "wifi-clientes-acaa1",
+      storageBucket: "wifi-clientes-acaa1.firebasestorage.app",
+      messagingSenderId: "227783158496",
+      appId: "1:227783158496:web:f5a722e590ce62cfd4fe85",
+      measurementId: "G-DKQQ965CXP"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+    function cleanCPF(s) {
+      return s.replace(/\D/g,''); // remove pontos e traços
+    }
+
+    async function hashCPF(cpf) {
+      const enc = new TextEncoder().encode(cpf);
+      const buf = await crypto.subtle.digest("SHA-256", enc);
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2,"0")).join("");
+    }
+
+    document.getElementById('f').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const raw = document.getElementById('cpf').value;
+      const cpf = cleanCPF(raw);
+      if(cpf.length !== 11){ alert("CPF inválido"); return; }
+
+      const hash = await hashCPF(cpf);
+
+      await push(ref(db,'acessos'), {
+        cpf_hash: hash,
+        ts: Date.now()
+      });
+
+      // Redireciona para liberar navegação
+      window.location.href = "https://www.gstatic.com/generate_204";
+    });
+  </script>
+</body>
+</html>
