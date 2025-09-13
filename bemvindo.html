@@ -1,12 +1,22 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Portal Wi-Fi</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bem-vindo</title>
+    <style>
+        * {margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;}
+        body {display:flex; justify-content:center; align-items:center; height:100vh; background:linear-gradient(135deg,#6a11cb,#2575fc); color:#fff; text-align:center;}
+        .container {background: rgba(255,255,255,0.1); padding:50px 40px; border-radius:20px; backdrop-filter:blur(10px); box-shadow:0 8px 32px rgba(0,0,0,0.3);}
+        h1 {font-size:2.5rem; margin-bottom:30px;}
+        .btn-sair {display:inline-block; padding:15px 30px; font-size:1.1rem; font-weight:bold; color:#2575fc; background-color:#fff; border:none; border-radius:50px; cursor:pointer; transition:all 0.3s ease; text-decoration:none;}
+        .btn-sair:hover {background-color:#2575fc; color:#fff; transform:translateY(-3px); box-shadow:0 5px 15px rgba(0,0,0,0.2);}
+    </style>
 </head>
 <body>
-  <h1>Portal Wi-Fi</h1>
-  <p>CPF válido!</p>
-  <a href="bemvindo.html">Entrar</a>
+    <div class="container">
+        <h1>Bem-vindo ao Portal Wi-Fi!</h1>
+        <a href="index.html" class="btn-entrar">Entrar</a>
+    </div>
 </body>
 </html>
