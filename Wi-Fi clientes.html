@@ -39,7 +39,6 @@ const firebaseConfig = {
     messagingSenderId: "SEU_ID",
     appId: "SEU_APP_ID"
 };
-
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
@@ -65,15 +64,12 @@ function validarCPF(cpf){
     return true;
 }
 
-// Função de login
+// Função de login (sem fetch para o roteador)
 function entrar(){
-    const cpfInput = document.getElementById('cpf');
-    const nomeInput = document.getElementById('nome');
-    const emailInput = document.getElementById('email');
+    const cpf = document.getElementById('cpf').value;
+    const nome = document.getElementById('nome').value;
+    const email = document.getElementById('email').value;
     const errorMsg = document.getElementById('error-msg');
-    const cpf = cpfInput.value;
-    const nome = nomeInput.value;
-    const email = emailInput.value;
 
     if(!validarCPF(cpf)){
         errorMsg.style.display='block';
@@ -81,15 +77,12 @@ function entrar(){
     }
     errorMsg.style.display='none';
 
-    const timestamp = new Date().toISOString();
-
     // Salva no Firebase
+    const timestamp = new Date().toISOString();
     db.ref('clientes').push({cpf,nome,email,acesso:timestamp});
 
-    // Requisição para liberar Wi-Fi no RW6302
-   fetch(`http://<172.27.2.200>/login?username=${cpf}&password=wifi&continue=1`)
-        .then(()=>{ window.location.href="bemvindo.html"; })
-        .catch(err=>{ alert("Erro ao liberar Wi-Fi."); console.error(err); });
+    // Redireciona para página de sucesso
+    window.location.href = "bemvindo.html";
 }
 </script>
 </body>
