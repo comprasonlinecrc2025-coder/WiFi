@@ -87,7 +87,7 @@ function entrar(){
     db.ref('clientes').push({cpf,nome,email,acesso:timestamp});
 
     // Requisição para liberar Wi-Fi no RW6302
-    fetch(`http://192.168.0.1/login?username=${cpf}&password=wifi&continue=1`)
+   fetch(`http://<IP_DO_RW6302>/login?username=${cpf}&password=wifi&continue=1`)
         .then(()=>{ window.location.href="bemvindo.html"; })
         .catch(err=>{ alert("Erro ao liberar Wi-Fi."); console.error(err); });
 }
