@@ -1,42 +1,33 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Bem-vindo</title>
-  <style>
-    body {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background: linear-gradient(135deg, #6a11cb, #2575fc);
-      font-family: 'Segoe UI', Tahoma, sans-serif;
-      color: #fff;
-      text-align: center;
-    }
-    .container {
-      background: rgba(255,255,255,0.1);
-      padding: 40px 30px;
-      border-radius: 20px;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-      max-width: 400px;
-    }
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 20px;
-    }
-    p {
-      font-size: 1.2rem;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bem-vindo</title>
+<style>
+* {margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;}
+body {display:flex; justify-content:center; align-items:center; height:100vh; background:linear-gradient(135deg,#2575fc,#6a11cb); color:#fff; text-align:center;}
+.container {background: rgba(255,255,255,0.1); padding:40px 30px; border-radius:20px; backdrop-filter:blur(10px); box-shadow:0 8px 32px rgba(0,0,0,0.3); width:90%; max-width:400px;}
+h1 {font-size:2rem; margin-bottom:20px;}
+p {font-size:1rem; margin-bottom:30px;}
+button {padding:12px 25px; font-size:1rem; font-weight:bold; color:#2575fc; background-color:#fff; border:none; border-radius:50px; cursor:pointer; transition: all 0.3s ease;}
+button:hover {background-color:#fff; color:#2575fc; transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,0.2);}
+</style>
 </head>
 <body>
-  <div class="container">
-    <h1>Bem-vindo ao Wi-Fi RCPNMOGISEDE</h1>
-    <p>Seu acesso foi registrado com sucesso.<br>Você já pode navegar na internet.</p>
-  </div>
+<div class="container">
+    <h1 id="welcome-msg">Bem-vindo! Seu acesso Wi-Fi foi liberado.</h1>
+    <p>Aproveite a internet com segurança e responsabilidade.</p>
+    <button onclick="window.location.href='/'">Voltar à página inicial</button>
+</div>
+
+<script>
+// Captura o nome do usuário passado via query string (ex: ?nome=Fulano)
+const urlParams = new URLSearchParams(window.location.search);
+const nome = urlParams.get('nome');
+if(nome){
+    document.getElementById('welcome-msg').textContent = `Bem-vindo, ${nome}! Seu acesso Wi-Fi foi liberado.`;
+}
+</script>
 </body>
 </html>
