@@ -4,10 +4,26 @@
 <meta charset="UTF-8">
 <title>Bem-vindo</title>
 <style>
-body {display:flex; justify-content:center; align-items:center; height:100vh; font-family:sans-serif; background:#2575fc; color:#fff;}
+body {display:flex; justify-content:center; align-items:center; height:100vh; font-family:sans-serif; background:#2575fc; color:#fff; flex-direction:column;}
+h1 {margin-bottom:20px;}
+button {padding:12px 20px; border:none; border-radius:8px; background:#fff; color:#2575fc; font-weight:bold; cursor:pointer;}
+button:hover {background:#eee;}
 </style>
 </head>
 <body>
-<h1>Bem-vindo! Seu acesso Wi-Fi foi liberado.</h1>
+    <h1>Bem-vindo! Seu acesso Wi-Fi foi liberado 🎉</h1>
+    <button onclick="logout()">Sair</button>
+
+<script>
+async function logout(){
+    try {
+        await fetch("/logout", {method:"POST", credentials:"include"});
+        alert("Sessão encerrada.");
+        window.location.href="index.html";
+    } catch(e){
+        alert("Erro ao sair.");
+    }
+}
+</script>
 </body>
 </html>
