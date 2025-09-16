@@ -5,45 +5,29 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Portal Wi-Fi</title>
 <style>
-* {margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;}
+* {margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, sans-serif;}
 body {display:flex; justify-content:center; align-items:center; height:100vh; background:linear-gradient(135deg,#2575fc,#6a11cb); color:#fff; text-align:center;}
-.container {background: rgba(255,255,255,0.1); padding:50px 40px; border-radius:20px; backdrop-filter:blur(10px); box-shadow:0 8px 32px rgba(0,0,0,0.3); width:100%; max-width:400px;}
-h1 {font-size:2rem; margin-bottom:30px;}
-input[type="text"], input[type="email"] {width:100%; padding:15px 20px; margin-bottom:20px; border-radius:50px; border:none; outline:none; font-size:1rem;}
-.btn-entrar {width:100%; padding:15px; font-size:1.1rem; font-weight:bold; color:#2575fc; background-color:#fff; border:none; border-radius:50px; cursor:pointer; transition: all 0.3s ease;}
-.btn-entrar:hover {background-color:#2575fc; color:#fff; transform:translateY(-3px); box-shadow:0 5px 15px rgba(0,0,0,0.2);}
-.error {color:#ff6b6b; margin-bottom:15px; font-size:0.9rem; display:none;}
+.container {background: rgba(255,255,255,0.1); padding:40px 30px; border-radius:20px; backdrop-filter:blur(10px); box-shadow:0 8px 32px rgba(0,0,0,0.3); width:100%; max-width:400px;}
+h1 {font-size:2rem; margin-bottom:25px;}
+input[type="text"], input[type="email"] {width:100%; padding:15px; margin-bottom:15px; border-radius:50px; border:none; outline:none; font-size:1rem;}
+.btn-entrar {width:100%; padding:15px; font-size:1.1rem; font-weight:bold; color:#2575fc; background:#fff; border:none; border-radius:50px; cursor:pointer; transition:.3s;}
+.btn-entrar:hover {background:#2575fc; color:#fff; transform:translateY(-3px); box-shadow:0 5px 15px rgba(0,0,0,0.2);}
+.error {color:#ff6b6b; margin-bottom:10px; font-size:0.9rem; display:none;}
 </style>
 </head>
 <body>
 <div class="container">
     <h1>Portal Wi-Fi</h1>
     <div class="error" id="error-msg">CPF inválido!</div>
-    <input type="text" id="cpf" placeholder="Digite seu CPF" maxlength="14">
-    <input type="text" id="nome" placeholder="Digite seu nome completo">
-    <input type="email" id="email" placeholder="Digite seu e-mail">
+    <input type="text" id="cpf" placeholder="Digite seu CPF" maxlength="14" required>
+    <input type="text" id="nome" placeholder="Digite seu nome completo" required>
+    <input type="email" id="email" placeholder="Digite seu e-mail" required>
     <button class="btn-entrar" onclick="entrar()">Entrar</button>
 </div>
 
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-
 <script>
-const firebaseConfig = {
-    apiKey: "SUA_API_KEY",
-    authDomain: "wifi-clientes-acaa1.firebaseapp.com",
-    databaseURL: "https://wifi-clientes-acaa1-default-rtdb.firebaseio.com",
-    projectId: "wifi-clientes-acaa1",
-    storageBucket: "wifi-clientes-acaa1.appspot.com",
-    messagingSenderId: "SEU_ID",
-    appId: "SEU_APP_ID"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-
-// Máscara de CPF
-document.getElementById('cpf').addEventListener('input', function(e){
+// Máscara CPF
+document.getElementById('cpf').addEventListener('input', function(){
     let v = this.value.replace(/\D/g,'');
     if(v.length>3) v=v.slice(0,3)+'.'+v.slice(3);
     if(v.length>7) v=v.slice(0,7)+'.'+v.slice(7);
@@ -51,21 +35,20 @@ document.getElementById('cpf').addEventListener('input', function(e){
     this.value = v;
 });
 
-// Validação de CPF
+// Validação CPF
 function validarCPF(cpf){
     cpf = cpf.replace(/[^\d]+/g,'');
     if(cpf.length!==11 || /^(\d)\1{10}$/.test(cpf)) return false;
     let soma=0; for(let i=0;i<9;i++) soma+=parseInt(cpf.charAt(i))*(10-i);
-    let resto = 11 - (soma % 11); if(resto===10||resto===11) resto=0;
+    let resto = 11 - (soma % 11); if(resto>=10) resto=0;
     if(resto!==parseInt(cpf.charAt(9))) return false;
     soma=0; for(let i=0;i<10;i++) soma+=parseInt(cpf.charAt(i))*(11-i);
-    resto = 11 - (soma % 11); if(resto===10||resto===11) resto=0;
-    if(resto!==parseInt(cpf.charAt(10))) return false;
-    return true;
+    resto = 11 - (soma % 11); if(resto>=10) resto=0;
+    return resto===parseInt(cpf.charAt(10));
 }
 
-// Função de login (sem fetch para o roteador)
-function entrar(){
+// Função de login
+async function entrar(){
     const cpf = document.getElementById('cpf').value;
     const nome = document.getElementById('nome').value;
     const email = document.getElementById('email').value;
@@ -77,12 +60,24 @@ function entrar(){
     }
     errorMsg.style.display='none';
 
-    // Salva no Firebase
-    const timestamp = new Date().toISOString();
-    db.ref('clientes').push({cpf,nome,email,acesso:timestamp});
+    try {
+        // 🔑 Envia CPF como username/senha para o hotspot
+        const resp = await fetch("/login", {
+            method:"POST",
+            headers:{"Content-Type":"application/x-www-form-urlencoded"},
+            body:`username=${encodeURIComponent(cpf)}&password=${encodeURIComponent(cpf)}`,
+            credentials:"include"
+        });
 
-    // Redireciona para página de sucesso
-    window.location.href = "bemvindo.html";
+        if(resp.ok || resp.status === 302){
+            window.location.href="bemvindo.html";
+        } else {
+            alert("Falha na autenticação. Código: " + resp.status);
+        }
+    } catch(e){
+        alert("Erro ao conectar ao hotspot.");
+        console.error(e);
+    }
 }
 </script>
 </body>
