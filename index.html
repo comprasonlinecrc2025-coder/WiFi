@@ -64,7 +64,7 @@ function validarCPF(cpf){
 
 // Tenta liberar em múltiplas VLANs
 async function liberarRoteador(mac){
-    const vlanIPs = ['10.40.71.1', '192.168.15.9'];
+    const vlanIPs = ['10.40.71.1', '192.168.15.9', '192.168.0.199'];
     for(const ip of vlanIPs){
         try{
             await fetch(`http://${ip}/login`, {
