@@ -109,10 +109,14 @@ submitBtn.addEventListener('click', async function(){
 
     // Salva no Firebase Realtime Database
     try {
+        const agora = new Date();
+        const dataHora = agora.toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
+
         await set(ref(db, 'usuarios/' + cpf), {
             nome: nome || '',
             email: email || '',
-            timestamp: Date.now()
+            timestamp: Date.now(),
+            dataHora: dataHora
         });
     } catch(err){
         console.error('Erro ao salvar no Firebase:', err);
