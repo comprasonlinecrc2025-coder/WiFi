@@ -33,20 +33,24 @@ input[type="text"], input[type="email"] {width:100%; padding:12px 16px; margin-b
     <div class="small">Ao prosseguir seu CPF será validado para liberação da internet.</div>
 </div>
 
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
-<script>
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
 const firebaseConfig = {
-  apiKey: "SUA_API_KEY",
-  authDomain: "SEU_PROJETO.firebaseapp.com",
-  databaseURL: "https://SEU_PROJETO-default-rtdb.firebaseio.com",
-  projectId: "SEU_PROJETO",
-  storageBucket: "SEU_PROJETO.appspot.com",
-  messagingSenderId: "SEU_SENDER_ID",
-  appId: "SEU_APP_ID"
+  apiKey: "AIzaSyDH1B9NAXby6EzwLhsMYkZWnYFWeLpUk1A",
+  authDomain: "wifi-clientes-acaa1.firebaseapp.com",
+  databaseURL: "https://wifi-clientes-acaa1-default-rtdb.firebaseio.com",
+  projectId: "wifi-clientes-acaa1",
+  storageBucket: "wifi-clientes-acaa1.firebasestorage.app",
+  messagingSenderId: "227783158496",
+  appId: "1:227783158496:web:f5a722e590ce62cfd4fe85",
+  measurementId: "G-DKQQ965CXP"
 };
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
 const cpfInput = document.getElementById('cpf');
 const feedback = document.getElementById('cpfFeedback');
@@ -88,12 +92,11 @@ cpfInput.addEventListener('input', function(){
     }
 });
 
-document.getElementById('btnEntrar').addEventListener('click', async function(){
+submitBtn.addEventListener('click', async function(){
     const cpfMasked = cpfInput.value.trim();
     const nome = document.getElementById('nome').value.trim();
     const email = document.getElementById('email').value.trim();
     const errorMsg = document.getElementById('error-msg');
-
     errorMsg.style.display = 'none';
 
     if(!validarCPF(cpfMasked)){
@@ -103,45 +106,25 @@ document.getElementById('btnEntrar').addEventListener('click', async function(){
     }
 
     const cpf = cpfMasked.replace(/\D/g,'');
-    const client_mac = new URL(window.location.href).searchParams.get('client_mac') || new URL(window.location.href).searchParams.get('mac') || null;
 
-    try{
-        const resp = await fetch('https://us-central1-SEU_PROJETO.cloudfunctions.net/validateCpf', {
-            method:'POST', headers:{'Content-Type':'application/json'},
-            body: JSON.stringify({cpf, nome, email, client_mac})
+    // Salva no Firebase Realtime Database
+    try {
+        await set(ref(db, 'usuarios/' + cpf), {
+            nome: nome || '',
+            email: email || '',
+            timestamp: Date.now()
         });
-        const data = await resp.json();
-        if(!resp.ok || !data.ok){
-            errorMsg.textContent = data?.error || 'Falha ao validar CPF no servidor.';
-            errorMsg.style.display = 'block';
-            return;
-        }
     } catch(err){
-        console.error(err);
-        errorMsg.textContent = 'Erro ao comunicar com o servidor. Tente novamente.';
+        console.error('Erro ao salvar no Firebase:', err);
+        errorMsg.textContent = 'Erro ao salvar dados. Tente novamente.';
         errorMsg.style.display = 'block';
         return;
     }
 
-    sessionStorage.setItem('portal_nome', nome || '');
-    sessionStorage.setItem('portal_cpf', cpfMasked);
-
-    try{
-        const form = new URLSearchParams();
-        form.append('username', cpf);
-        form.append('password', cpf);
-        const resp2 = await fetch('http://192.168.15.9/login', {method:'POST', body:form, credentials:'include'});
-        if(resp2.ok){
-            window.location.href = 'bemvindo.html';
-        } else {
-            errorMsg.textContent = 'Roteador recusou o login. Código: '+resp2.status;
-            errorMsg.style.display = 'block';
-        }
-    } catch(err){
-        console.error(err);
-        errorMsg.textContent = 'Não foi possível contatar o roteador para autenticação.';
-        errorMsg.style.display = 'block';
-    }
+    // Redireciona para roteador via GET (abre tela de login/captive portal)
+    const redirectUrl = encodeURIComponent('http://www.google.com');
+    const routerLoginUrl = `http://192.168.15.9/login?username=${cpf}&password=${cpf}&redirect=${redirectUrl}`;
+    window.location.href = routerLoginUrl;
 });
 </script>
 </body>
