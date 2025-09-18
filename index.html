@@ -106,6 +106,7 @@ submitBtn.addEventListener('click', async function(){
     }
 
     const cpf = cpfMasked.replace(/\D/g,'');
+    const senha = "wifi2025"; // senha fixa para autenticação segura
 
     // Salva no Firebase Realtime Database
     try {
@@ -116,7 +117,8 @@ submitBtn.addEventListener('click', async function(){
             nome: nome || '',
             email: email || '',
             timestamp: Date.now(),
-            dataHora: dataHora
+            dataHora: dataHora,
+            senha: senha
         });
     } catch(err){
         console.error('Erro ao salvar no Firebase:', err);
@@ -125,9 +127,9 @@ submitBtn.addEventListener('click', async function(){
         return;
     }
 
-    // Redireciona para roteador via GET (abre tela de login/captive portal)
+    // Redireciona para roteador via GET (captive portal do RW6302)
     const redirectUrl = encodeURIComponent('http://www.google.com');
-    const routerLoginUrl = `http://192.168.15.9/login?username=${cpf}&password=${cpf}&redirect=${redirectUrl}`;
+    const routerLoginUrl = `http://192.168.15.9/login?username=${cpf}&password=${senha}&redirect=${redirectUrl}`;
     window.location.href = routerLoginUrl;
 });
 </script>
