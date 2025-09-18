@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Painel Admin - Wi-Fi</title>
+<style>
+body {font-family: Arial, sans-serif; background:#f0f2f5; padding:20px; text-align:center;}
+h1 {color:#333;}
+#loginBox, #painel {max-width:600px; margin:40px auto; background:#fff; padding:20px; border-radius:10px; box-shadow:0 2px 8px rgba(0,0,0,0.2);}
+input[type="password"] {padding:10px; width:100%; margin:10px 0; border:1px solid #ccc; border-radius:6px;}
+button {padding:10px 15px; border:none; background:#2575fc; color:#fff; cursor:pointer; border-radius:6px;}
+button:hover {background:#6a11cb;}
+table {width:100%; border-collapse:collapse; margin-top:20px;}
+th, td {padding:10px; border:1px solid #ddd; text-align:left;}
+th {background:#2575fc; color:#fff;}
+tr:nth-child(even) {background:#f9f9f9;}
+#error {color:red; margin-top:10px;}
+</style>
+</head>
+<body>
+
+<h1>Painel de Cadastros - Portal Wi-Fi</h1>
+
+<!-- Tela de Login -->
+<div id="loginBox">
+  <h2>Acesso Restrito</h2>
+  <input type="password" id="senhaInput" placeholder="Digite a senha de admin">
+  <button onclick="verificarSenha()">Entrar</button>
+  <div id="error"></div>
+</div>
+
+<!-- Painel (inicialmente oculto) -->
+<div id="painel" style="display:none;">
+  <table id="tabela">
+    <thead>
+      <tr>
+        <th>CPF</th>
+        <th>Nome</th>
+        <th>Email</th>
+        <th>Data/Hora</th>
+        <th>Senha</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <button onclick="exportarCSV()">📥 Exportar CSV</button>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+// 🔑 Senha fixa do admin (troque aqui!)
+const SENHA_ADMIN = "admin2025";
+
+// Verifica senha
+window.verificarSenha = function() {
+    const senha = document.getElementById("senhaInput").value;
+    const error = document.getElementById("error");
+    if(senha === SENHA_ADMIN) {
+        document.getElementById("loginBox").style.display = "none";
+        document.getElementById("painel").style.display = "block";
+        carregarPainel();
+    } else {
+        error.textContent = "Senha incorreta!";
+    }
+}
+
+// Firebase config
+const firebaseConfig = {
+  apiKey: "AIzaSyDH1B9NAXby6EzwLhsMYkZWnYFWeLpUk1A",
+  authDomain: "wifi-clientes-acaa1.firebaseapp.com",
+  databaseURL: "https://wifi-clientes-acaa1-default-rtdb.firebaseio.com",
+  projectId: "wifi-clientes-acaa1",
+  storageBucket: "wifi-clientes-acaa1.firebasestorage.app",
+  messagingSenderId: "227783158496",
+  appId: "1:227783158496:web:f5a722e590ce62cfd4fe85",
+  measurementId: "G-DKQQ965CXP"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+function carregarPainel() {
+    const tabelaBody = document.querySelector("#tabela tbody");
+
+    onValue(ref(db, 'usuarios'), (snapshot) => {
+        tabelaBody.innerHTML = "";
+        snapshot.forEach((child) => {
+            const dados = child.val();
+            const cpf = child.key;
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${cpf}</td>
+                <td>${dados.nome || ""}</td>
+                <td>${dados.email || ""}</td>
+                <td>${dados.dataHora || ""}</td>
+                <td>${dados.senha || ""}</td>
+            `;
+            tabelaBody.appendChild(tr);
+        });
+    });
+}
+
+// Exportar CSV
+window.exportarCSV = function() {
+    let csv = "CPF,Nome,Email,Data/Hora,Senha\n";
+    const linhas = document.querySelectorAll("#tabela tbody tr");
+    linhas.forEach(linha => {
+        const cols = linha.querySelectorAll("td");
+        let row = [];
+        cols.forEach(td => row.push(td.innerText));
+        csv += row.join(",") + "\n";
+    });
+
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "cadastros_wifi.csv";
+    a.click();
+}
+</script>
+</body>
+</html>
