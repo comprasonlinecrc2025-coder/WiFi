@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Portal Wi-Fi</title>
 <style>
 * {margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;}
@@ -33,7 +33,6 @@ input[type="text"], input[type="email"] {width:100%; padding:12px 16px; margin-b
     <div class="small">Ao prosseguir seu CPF será validado para liberação da internet.</div>
 </div>
 
-<!-- Firebase SDK -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
@@ -106,9 +105,8 @@ submitBtn.addEventListener('click', async function(){
     }
 
     const cpf = cpfMasked.replace(/\D/g,'');
-    const senha = "wifi2025"; // senha fixa para autenticação segura
+    const senha = cpf; // senha = CPF
 
-    // Salva no Firebase Realtime Database
     try {
         const agora = new Date();
         const dataHora = agora.toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
@@ -127,9 +125,11 @@ submitBtn.addEventListener('click', async function(){
         return;
     }
 
-    // Redireciona para roteador via GET (captive portal do RW6302)
-    const redirectUrl = encodeURIComponent('http://www.google.com');
-   });
+    // Redireciona para roteador RW6302 usando GET para autenticação
+    const redirectUrl = encodeURIComponent('http://www.google.com'); // ou outro site
+    const routerLoginUrl = `http://192.168.15.9/login?username=${cpf}&password=${senha}&redirect=${redirectUrl}`;
+    window.location.href = routerLoginUrl;
+});
 </script>
 </body>
 </html>
