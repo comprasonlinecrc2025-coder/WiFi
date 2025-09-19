@@ -38,8 +38,9 @@ const cpfInput = document.getElementById('cpf');
 const feedback = document.getElementById('cpfFeedback');
 const submitBtn = document.getElementById('btnEntrar');
 const errorMsg = document.getElementById('error-msg');
+
 const ROUTER_IP = '192.168.15.9'; // IP do RW6302
-const BACKEND_URL = 'http://<IP_DO_BACKEND>:3000/create-user'; // IP do backend
+const BACKEND_URL = 'http://192.168.15.100:3000/create-user'; // Substitua pelo IP do backend
 
 // Formata CPF
 function formatCPF(value) {
@@ -66,7 +67,7 @@ function validarCPF(cpfRaw){
     return true;
 }
 
-// Validação e habilitação do botão
+// Habilita botão se CPF válido
 cpfInput.addEventListener('input', function(){
     this.value = formatCPF(this.value);
     if(validarCPF(this.value)){
@@ -80,7 +81,7 @@ cpfInput.addEventListener('input', function(){
     }
 });
 
-// Envio do formulário
+// Envio para backend e redirecionamento
 submitBtn.addEventListener('click', async function(){
     const cpfMasked = cpfInput.value.trim();
     const nome = document.getElementById('nome').value.trim();
