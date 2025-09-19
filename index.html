@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Portal Wi-Fi</title>
 <style>
 * {margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;}
@@ -17,9 +17,6 @@ input[type="text"], input[type="email"] {width:100%; padding:12px 16px; margin-b
 .valid {color:#00ff88; display:block; margin-top:6px;}
 .invalid {color:#ff4c4c; display:block; margin-top:6px;}
 </style>
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.3.1/firebase-database.js"></script>
 </head>
 <body>
 <div class="container">
@@ -36,27 +33,28 @@ input[type="text"], input[type="email"] {width:100%; padding:12px 16px; margin-b
     <div class="small">Ao prosseguir seu CPF será validado para liberação da internet.</div>
 </div>
 
-<script>
-// Firebase configuration
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
 const firebaseConfig = {
-  apiKey: "SUA_API_KEY",
+  apiKey: "AIzaSyDH1B9NAXby6EzwLhsMYkZWnYFWeLpUk1A",
   authDomain: "wifi-clientes-acaa1.firebaseapp.com",
   databaseURL: "https://wifi-clientes-acaa1-default-rtdb.firebaseio.com",
   projectId: "wifi-clientes-acaa1",
-  storageBucket: "wifi-clientes-acaa1.appspot.com",
-  messagingSenderId: "SEU_SENDER_ID",
-  appId: "SEU_APP_ID"
+  storageBucket: "wifi-clientes-acaa1.firebasestorage.app",
+  messagingSenderId: "227783158496",
+  appId: "1:227783158496:web:f5a722e590ce62cfd4fe85",
+  measurementId: "G-DKQQ965CXP"
 };
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
 const cpfInput = document.getElementById('cpf');
 const feedback = document.getElementById('cpfFeedback');
 const submitBtn = document.getElementById('btnEntrar');
-const errorMsg = document.getElementById('error-msg');
-
-const ROUTER_IP = '192.168.15.9';
 
 function formatCPF(value) {
     value = value.replace(/\D/g, '');
@@ -70,14 +68,14 @@ function validarCPF(cpfRaw){
     const cpf = (cpfRaw||'').replace(/\D/g,'');
     if(cpf.length !== 11) return false;
     if(/^(\d)\1{10}$/.test(cpf)) return false;
-    let soma=0;
-    for(let i=0;i<9;i++) soma+=parseInt(cpf.charAt(i))*(10-i);
-    let resto=11-(soma%11); if(resto===10||resto===11) resto=0;
-    if(resto!==parseInt(cpf.charAt(9))) return false;
-    soma=0;
-    for(let i=0;i<10;i++) soma+=parseInt(cpf.charAt(i))*(11-i);
-    resto=11-(soma%11); if(resto===10||resto===11) resto=0;
-    if(resto!==parseInt(cpf.charAt(10))) return false;
+    let soma = 0;
+    for(let i=0;i<9;i++) soma += parseInt(cpf.charAt(i))*(10-i);
+    let resto = 11 - (soma % 11); if(resto === 10 || resto === 11) resto = 0;
+    if(resto !== parseInt(cpf.charAt(9))) return false;
+    soma = 0;
+    for(let i=0;i<10;i++) soma += parseInt(cpf.charAt(i))*(11-i);
+    resto = 11 - (soma % 11); if(resto === 10 || resto === 11) resto = 0;
+    if(resto !== parseInt(cpf.charAt(10))) return false;
     return true;
 }
 
@@ -98,6 +96,7 @@ submitBtn.addEventListener('click', async function(){
     const cpfMasked = cpfInput.value.trim();
     const nome = document.getElementById('nome').value.trim();
     const email = document.getElementById('email').value.trim();
+    const errorMsg = document.getElementById('error-msg');
     errorMsg.style.display = 'none';
 
     if(!validarCPF(cpfMasked)){
@@ -107,16 +106,31 @@ submitBtn.addEventListener('click', async function(){
     }
 
     const cpf = cpfMasked.replace(/\D/g,'');
-    const timestamp = new Date().toISOString();
-    await db.ref('clientes/' + cpf).set({
-        cpf,
-        nome,
-        email,
-        dataHora: timestamp
-    });
+    const senha = "wifi2025"; // senha fixa para autenticação segura
 
-    const redirectUrl = encodeURIComponent('http://www.google.com'); 
-    window.location.href = `http://${ROUTER_IP}/login?username=${cpf}&password=${cpf}&redirect=${redirectUrl}`;
+    // Salva no Firebase Realtime Database
+    try {
+        const agora = new Date();
+        const dataHora = agora.toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
+
+        await set(ref(db, 'usuarios/' + cpf), {
+            nome: nome || '',
+            email: email || '',
+            timestamp: Date.now(),
+            dataHora: dataHora,
+            senha: senha
+        });
+    } catch(err){
+        console.error('Erro ao salvar no Firebase:', err);
+        errorMsg.textContent = 'Erro ao salvar dados. Tente novamente.';
+        errorMsg.style.display = 'block';
+        return;
+    }
+
+    // Redireciona para roteador via GET (captive portal do RW6302)
+    const redirectUrl = encodeURIComponent('http://www.google.com');
+    const routerLoginUrl = `http://192.168.15.9/login?username=${cpf}&password=${senha}&redirect=${redirectUrl}`;
+    window.location.href = routerLoginUrl;
 });
 </script>
 </body>
