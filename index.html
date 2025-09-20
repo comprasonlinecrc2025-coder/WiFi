@@ -1,25 +1,25 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Portal Wi-Fi</title>
-<style>
-* {margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;}
-body {display:flex; justify-content:center; align-items:center; height:100vh; background:linear-gradient(135deg,#2575fc,#6a11cb); color:#fff; text-align:center;}
-.container {background: rgba(255,255,255,0.08); padding:40px 30px; border-radius:18px; backdrop-filter:blur(8px); box-shadow:0 8px 32px rgba(0,0,0,0.25); width:100%; max-width:420px;}
-h1 {font-size:1.8rem; margin-bottom:20px;}
-input[type="text"], input[type="email"] {width:100%; padding:12px 16px; margin-bottom:12px; border-radius:999px; border:none; outline:none; font-size:0.95rem;}
-.btn-entrar {width:100%; padding:12px; font-size:1.05rem; font-weight:700; color:#2575fc; background:#fff; border:none; border-radius:999px; cursor:pointer;}
-.btn-entrar:hover {transform:translateY(-3px); box-shadow:0 6px 18px rgba(0,0,0,0.18);}
-.error {color:#ffb4b4; margin-top:10px; display:none; font-weight:600;}
-.small {font-size:0.85rem; opacity:0.9; margin-top:12px;}
-.valid {color:#00ff88; display:block; margin-top:6px;}
-.invalid {color:#ff4c4c; display:block; margin-top:6px;}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Portal Wi-Fi</title>
+  <style>
+    * {margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;}
+    body {display:flex; justify-content:center; align-items:center; height:100vh; background:linear-gradient(135deg,#2575fc,#6a11cb); color:#fff; text-align:center;}
+    .container {background: rgba(255,255,255,0.08); padding:40px 30px; border-radius:18px; backdrop-filter:blur(8px); box-shadow:0 8px 32px rgba(0,0,0,0.25); width:100%; max-width:420px;}
+    margin-bottom:20px;}
+    input[type="text"], input[type="email"] {width:100%; padding:12px 16px; margin-bottom:12px; border-radius:999px; border:none; outline:none; font-size:0.95rem;}
+    .btn-entrar {width:100%; padding:12px; font-size:1.05rem; font-weight:700; color:#2575fc; background:#fff; border:none; border-radius:999px; cursor:pointer;}
+    .btn-entrar:hover {transform:translateY(-3px); box-shadow:0 6px 18px rgba(0,0,0,0.18);}
+    .error {color:#ffb4b4; margin-top:10px; display:none; font-weight:600;}
+    .small {font-size:0.85rem; opacity:0.9; margin-top:12px;}
+    .valid {color:#00ff88; display:block; margin-top:6px;}
+    .invalid {color:#ff4c4c; display:block; margin-top:6px;}
+  </style>
 </head>
 <body>
-<div class="container">
+  <div class="container">
     <h1>Portal Wi-Fi</h1>
     <div class="error" id="error-msg"></div>
 
@@ -31,107 +31,107 @@ input[type="text"], input[type="email"] {width:100%; padding:12px 16px; margin-b
     <button class="btn-entrar" id="btnEntrar" disabled>Entrar</button>
 
     <div class="small">Ao prosseguir seu CPF será validado para liberação da internet.</div>
-</div>
+  </div>
 
-<!-- Firebase SDK -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyDH1B9NAXby6EzwLhsMYkZWnYFWeLpUk1A",
-  authDomain: "wifi-clientes-acaa1.firebaseapp.com",
-  databaseURL: "https://wifi-clientes-acaa1-default-rtdb.firebaseio.com",
-  projectId: "wifi-clientes-acaa1",
-  storageBucket: "wifi-clientes-acaa1.firebasestorage.app",
-  messagingSenderId: "227783158496",
-  appId: "1:227783158496:web:f5a722e590ce62cfd4fe85",
-  measurementId: "G-DKQQ965CXP"
-};
+    const firebaseConfig = {
+      apiKey: "AIzaSyDH1B9NAXby6EzwLhsMYkZWnYFWeLpUk1A",
+      authDomain: "wifi-clientes-acaa1.firebaseapp.com",
+      databaseURL: "https://wifi-clientes-acaa1-default-rtdb.firebaseio.com",
+      projectId: "wifi-clientes-acaa1",
+      storageBucket: "wifi-clientes-acaa1.appspot.com",
+      messagingSenderId: "227783158496",
+      appId: "1:227783158496:web:f5a722e590ce62cfd4fe85",
+      measurementId: "G-DKQQ965CXP"
+    };
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
 
-const cpfInput = document.getElementById('cpf');
-const feedback = document.getElementById('cpfFeedback');
-const submitBtn = document.getElementById('btnEntrar');
+    const cpfInput = document.getElementById('cpf');
+    const feedback = document.getElementById('cpfFeedback');
+    const submitBtn = document.getElementById('btnEntrar');
 
-function formatCPF(value) {
-    value = value.replace(/\D/g, '');
-    if (value.length > 3) value = value.replace(/^(\d{3})(\d)/, '$1.$2');
-    if (value.length > 6) value = value.replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3');
-    if (value.length > 9) value = value.replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3-$4');
-    return value;
-}
+    function formatCPF(value) {
+      value = value.replace(/\D/g, '');
+      if (value.length > 3) value = value.replace(/^(\d{3})(\d)/, '$1.$2');
+      if (value.length > 6) value = value.replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3');
+      if (value.length > 9) value = value.replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3-$4');
+      return value;
+    }
 
-function validarCPF(cpfRaw){
-    const cpf = (cpfRaw||'').replace(/\D/g,'');
-    if(cpf.length !== 11) return false;
-    if(/^(\d)\1{10}$/.test(cpf)) return false;
-    let soma = 0;
-    for(let i=0;i<9;i++) soma += parseInt(cpf.charAt(i))*(10-i);
-    let resto = 11 - (soma % 11); if(resto === 10 || resto === 11) resto = 0;
-    if(resto !== parseInt(cpf.charAt(9))) return false;
-    soma = 0;
-    for(let i=0;i<10;i++) soma += parseInt(cpf.charAt(i))*(11-i);
-    resto = 11 - (soma % 11); if(resto === 10 || resto === 11) resto = 0;
-    if(resto !== parseInt(cpf.charAt(10))) return false;
-    return true;
-}
+    function validarCPF(cpfRaw){
+      const cpf = (cpfRaw||'').replace(/\D/g,'');
+      if(cpf.length !== 11) return false;
+      if(/^(\d)\1{10}$/.test(cpf)) return false;
+      let soma = 0;
+      for(let i=0;i<9;i++) soma += parseInt(cpf.charAt(i))*(10-i);
+      let resto = 11 - (soma % 11); if(resto === 10 || resto === 11) resto = 0;
+      if(resto !== parseInt(cpf.charAt(9))) return false;
+      soma = 0;
+      for(let i=0;i<10;i++) soma += parseInt(cpf.charAt(i))*(11-i);
+      resto = 11 - (soma % 11); if(resto === 10 || resto === 11) resto = 0;
+      if(resto !== parseInt(cpf.charAt(10))) return false;
+      return true;
+    }
 
-cpfInput.addEventListener('input', function(){
-    this.value = formatCPF(this.value);
-    if(validarCPF(this.value)){
+    cpfInput.addEventListener('input', function(){
+      this.value = formatCPF(this.value);
+      if(validarCPF(this.value)){
         feedback.textContent = 'CPF válido';
         feedback.className = 'valid';
         submitBtn.disabled = false;
-    } else {
+      } else {
         feedback.textContent = 'CPF inválido';
         feedback.className = 'invalid';
         submitBtn.disabled = true;
-    }
-});
+      }
+    });
 
-submitBtn.addEventListener('click', async function(){
-    const cpfMasked = cpfInput.value.trim();
-    const nome = document.getElementById('nome').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const errorMsg = document.getElementById('error-msg');
-    errorMsg.style.display = 'none';
+    submitBtn.addEventListener('click', async function(){
+      const cpfMasked = cpfInput.value.trim();
+      const nome = document.getElementById('nome').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const errorMsg = document.getElementById('error-msg');
+      errorMsg.style.display = 'none';
 
-    if(!validarCPF(cpfMasked)){
+      if(!validarCPF(cpfMasked)){
         errorMsg.textContent = 'CPF inválido! Verifique e tente novamente.';
         errorMsg.style.display = 'block';
         return;
-    }
+      }
 
-    const cpf = cpfMasked.replace(/\D/g,'');
-    const senha = "wifi2025"; // senha fixa para autenticação segura
+      const cpf = cpfMasked.replace(/\D/g,'');
 
-    // Salva no Firebase Realtime Database
-    try {
+      try {
         const agora = new Date();
         const dataHora = agora.toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
 
         await set(ref(db, 'usuarios/' + cpf), {
-            nome: nome || '',
-            email: email || '',
-            timestamp: Date.now(),
-            dataHora: dataHora,
-            senha: senha
+          nome: nome || '',
+          email: email || '',
+          timestamp: Date.now(),
+          dataHora: dataHora
         });
-    } catch(err){
+      } catch(err){
         console.error('Erro ao salvar no Firebase:', err);
         errorMsg.textContent = 'Erro ao salvar dados. Tente novamente.';
         errorMsg.style.display = 'block';
         return;
-    }
+      }
 
-    // Redireciona para roteador via GET (captive portal do RW6302)
-    const redirectUrl = encodeURIComponent('http://www.google.com');
-    const routerLoginUrl = `http://192.168.15.9/login?username=${cpf}&password=${senha}&redirect=${redirectUrl}`;
-    window.location.href = routerLoginUrl;
-});
-</script>
+      // Captura a URL originalmente buscada
+      const urlParams = new URLSearchParams(window.location.search);
+      const redirectUrl = urlParams.get('redirect') || 'http://www.google.com';
+
+      // Redireciona para o roteador com CPF como senha (ou sem senha, se permitido)
+      const routerLoginUrl = `http://192.168.15.9/login?username=${cpf}&password=${cpf}&redirect=${encodeURIComponent(redirectUrl)}`;
+      window.location.href = routerLoginUrl;
+    });
+  </script>
 </body>
 </html>
