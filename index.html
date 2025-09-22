@@ -126,7 +126,8 @@
       const urlParams = new URLSearchParams(window.location.search);
       const redirectUrl = urlParams.get('redirect') || 'http://www.google.com';
 
-      const routerLoginUrl = `http://192.168.15.9/login?username=${cpf}&password=${cpf}&redirect=${encodeURIComponent(redirectUrl)}`;
+      // **IP atualizado para o novo servidor**
+      const routerLoginUrl = `http://172.27.2.200/login?username=${cpf}&password=${cpf}&redirect=${encodeURIComponent(redirectUrl)}`;
       window.location.href = routerLoginUrl;
     });
   </script>
