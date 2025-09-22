@@ -37,6 +37,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
     import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
+    // Configuração Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyDH1B9NAXby6EzwLhsMYkZWnYFWeLpUk1A",
       authDomain: "wifi-clientes-acaa1.firebaseapp.com",
@@ -123,10 +124,9 @@
         return;
       }
 
+      // Redireciona para Hotspot sem gerar 404
       const urlParams = new URLSearchParams(window.location.search);
       const redirectUrl = urlParams.get('redirect') || 'http://www.google.com';
-
-      // Usando o IP do servidor 172.27.2.200
       const routerLoginUrl = `http://172.27.2.200/login?username=${cpf}&password=${cpf}&redirect=${encodeURIComponent(redirectUrl)}`;
       window.location.href = routerLoginUrl;
     });
