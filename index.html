@@ -127,7 +127,7 @@
       // Redireciona para Hotspot sem gerar 404
       const urlParams = new URLSearchParams(window.location.search);
       const redirectUrl = urlParams.get('redirect') || 'http://www.google.com';
-     const routerLoginUrl = `http://172.21.240.1/login?username=${cpf}&password=${cpf}&redirect=${encodeURIComponent(redirectUrl)}`;
+     const routerLoginUrl = `http://192.168.15.100/login?username=${cpf}&password=${cpf}&redirect=${encodeURIComponent(redirectUrl)}`;
       window.location.href = routerLoginUrl;
     });
   </script>
