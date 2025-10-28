@@ -33,25 +33,7 @@
     <div class="small">Ao prosseguir seu CPF será validado para liberação da internet.</div>
   </div>
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
-
-    // Configuração Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyDH1B9NAXby6EzwLhsMYkZWnYFWeLpUk1A",
-      authDomain: "wifi-clientes-acaa1.firebaseapp.com",
-      databaseURL: "https://wifi-clientes-acaa1-default-rtdb.firebaseio.com",
-      projectId: "wifi-clientes-acaa1",
-      storageBucket: "wifi-clientes-acaa1.appspot.com",
-      messagingSenderId: "227783158496",
-      appId: "1:227783158496:web:f5a722e590ce62cfd4fe85",
-      measurementId: "G-DKQQ965CXP"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getDatabase(app);
-
+  <script>
     const cpfInput = document.getElementById('cpf');
     const feedback = document.getElementById('cpfFeedback');
     const submitBtn = document.getElementById('btnEntrar');
@@ -92,10 +74,8 @@
       }
     });
 
-    submitBtn.addEventListener('click', async function(){
+    submitBtn.addEventListener('click', function(){
       const cpfMasked = cpfInput.value.trim();
-      const nome = document.getElementById('nome').value.trim();
-      const email = document.getElementById('email').value.trim();
       const errorMsg = document.getElementById('error-msg');
       errorMsg.style.display = 'none';
 
@@ -107,27 +87,10 @@
 
       const cpf = cpfMasked.replace(/\D/g,'');
 
-      try {
-        const agora = new Date();
-        const dataHora = agora.toLocaleString("pt-BR", { timeZone: "America/Sao_Paulo" });
-
-        await set(ref(db, 'usuarios/' + cpf), {
-          nome: nome || '',
-          email: email || '',
-          timestamp: Date.now(),
-          dataHora: dataHora
-        });
-      } catch(err){
-        console.error('Erro ao salvar no Firebase:', err);
-        errorMsg.textContent = 'Erro ao salvar dados. Tente novamente.';
-        errorMsg.style.display = 'block';
-        return;
-      }
-
       // Redireciona para Hotspot sem gerar 404
       const urlParams = new URLSearchParams(window.location.search);
       const redirectUrl = urlParams.get('redirect') || 'http://www.google.com';
-     const routerLoginUrl = `http://192.168.15.5/login?username=${cpf}&password=${cpf}&redirect=${encodeURIComponent(redirectUrl)}`;
+      const routerLoginUrl = `http://192.168.15.5/login?username=${cpf}&password=${cpf}&redirect=${encodeURIComponent(redirectUrl)}`;
       window.location.href = routerLoginUrl;
     });
   </script>
