@@ -1,98 +1,264 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Portal Wi-Fi</title>
-  <style>
-    * {margin:0; padding:0; box-sizing:border-box; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;}
-    body {display:flex; justify-content:center; align-items:center; height:100vh; background:linear-gradient(135deg,#2575fc,#6a11cb); color:#fff; text-align:center;}
-    .container {background: rgba(255,255,255,0.08); padding:40px 30px; border-radius:18px; backdrop-filter:blur(8px); box-shadow:0 8px 32px rgba(0,0,0,0.25); width:100%; max-width:420px;}
-    h1 {font-size:1.8rem; margin-bottom:20px;}
-    input[type="text"], input[type="email"] {width:100%; padding:12px 16px; margin-bottom:12px; border-radius:999px; border:none; outline:none; font-size:0.95rem;}
-    .btn-entrar {width:100%; padding:12px; font-size:1.05rem; font-weight:700; color:#2575fc; background:#fff; border:none; border-radius:999px; cursor:pointer;}
-    .btn-entrar:hover {transform:translateY(-3px); box-shadow:0 6px 18px rgba(0,0,0,0.18);}
-    .error {color:#ffb4b4; margin-top:10px; display:none; font-weight:600;}
-    .small {font-size:0.85rem; opacity:0.9; margin-top:12px;}
-    .valid {color:#00ff88; display:block; margin-top:6px;}
-    .invalid {color:#ff4c4c; display:block; margin-top:6px;}
-  </style>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Wi-Fi - CRC 2025</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+        
+        h1 {
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            background: rgba(255, 255, 255, 0.9);
+        }
+        
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background: #45a049;
+        }
+        
+        button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .message {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+        }
+        
+        .success {
+            background: #4CAF50;
+            color: white;
+        }
+        
+        .error {
+            background: #f44336;
+            color: white;
+        }
+        
+        .info {
+            background: #2196F3;
+            color: white;
+        }
+        
+        .cpf-feedback {
+            font-size: 12px;
+            margin-top: 5px;
+            display: block;
+        }
+        
+        .valid { color: #4CAF50; }
+        .invalid { color: #f44336; }
+    </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Portal Wi-Fi</h1>
-    <div class="error" id="error-msg"></div>
+    <div class="container">
+        <h1>🌐 Portal Wi-Fi CRC 2025</h1>
+        <p>Preencha seus dados para acessar a internet</p>
+        
+        <form method="post" action="$PORTAL_ACTION$">
+            <!-- Campos obrigatórios do pfSense -->
+            <input type="hidden" name="auth_user" id="auth_user" value="usuario">
+            <input type="hidden" name="auth_pass" id="auth_pass" value="senha">
+            <input type="hidden" name="redirurl" id="redirurl" value="$PORTAL_REDIRURL$">
+            <input type="hidden" name="zone" value="$PORTAL_ZONE$">
+            
+            <!-- Campos do formulário -->
+            <div class="form-group">
+                <label for="cpf">CPF:</label>
+                <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" maxlength="14" required>
+                <span id="cpfFeedback" class="cpf-feedback"></span>
+            </div>
+            
+            <div class="form-group">
+                <label for="nome">Nome Completo:</label>
+                <input type="text" id="nome" name="nome" placeholder="Seu nome completo" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="email">E-mail (opcional):</label>
+                <input type="text" id="email" name="email" placeholder="seu@email.com">
+            </div>
+            
+            <button type="submit" id="submitBtn" disabled>
+                ✅ Conectar à Internet
+            </button>
+        </form>
+        
+        <div class="message info" style="display: block; margin-top: 20px;">
+            ⏰ Tempo de acesso: <strong>30 minutos</strong>
+        </div>
+    </div>
 
-    <input type="text" id="cpf" placeholder="Digite seu CPF" maxlength="14" autocomplete="off" />
-    <input type="text" id="nome" placeholder="Digite seu nome completo" autocomplete="name" />
-    <input type="email" id="email" placeholder="Digite seu e-mail (opcional)" autocomplete="email" />
+    <script>
+        // Elementos do DOM
+        const cpfInput = document.getElementById('cpf');
+        const nomeInput = document.getElementById('nome');
+        const submitBtn = document.getElementById('submitBtn');
+        const cpfFeedback = document.getElementById('cpfFeedback');
+        const authUser = document.getElementById('auth_user');
+        const authPass = document.getElementById('auth_pass');
+        const redirUrl = document.getElementById('redirurl');
 
-    <span id="cpfFeedback"></span>
-    <button class="btn-entrar" id="btnEntrar" disabled>Entrar</button>
+        // Formatar CPF
+        function formatarCPF(cpf) {
+            cpf = cpf.replace(/\D/g, '');
+            cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
+            cpf = cpf.replace(/(\d{3})(\d)/, '$1.$2');
+            cpf = cpf.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+            return cpf;
+        }
 
-    <div class="small">Ao prosseguir seu CPF será validado para liberação da internet.</div>
-  </div>
+        // Validar CPF
+        function validarCPF(cpf) {
+            cpf = cpf.replace(/\D/g, '');
+            
+            if (cpf.length !== 11) return false;
+            if (/^(\d)\1{10}$/.test(cpf)) return false;
+            
+            let soma = 0;
+            for (let i = 0; i < 9; i++) {
+                soma += parseInt(cpf.charAt(i)) * (10 - i);
+            }
+            
+            let resto = 11 - (soma % 11);
+            if (resto === 10 || resto === 11) resto = 0;
+            if (resto !== parseInt(cpf.charAt(9))) return false;
+            
+            soma = 0;
+            for (let i = 0; i < 10; i++) {
+                soma += parseInt(cpf.charAt(i)) * (11 - i);
+            }
+            
+            resto = 11 - (soma % 11);
+            if (resto === 10 || resto === 11) resto = 0;
+            if (resto !== parseInt(cpf.charAt(10))) return false;
+            
+            return true;
+        }
 
-  <script>
-    const cpfInput = document.getElementById('cpf');
-    const feedback = document.getElementById('cpfFeedback');
-    const submitBtn = document.getElementById('btnEntrar');
+        // Evento de input no CPF
+        cpfInput.addEventListener('input', function() {
+            this.value = formatarCPF(this.value);
+            
+            const cpfValido = validarCPF(this.value);
+            const nomePreenchido = nomeInput.value.trim().length > 0;
+            
+            if (cpfValido) {
+                cpfFeedback.textContent = '✅ CPF válido';
+                cpfFeedback.className = 'cpf-feedback valid';
+            } else {
+                cpfFeedback.textContent = '❌ CPF inválido';
+                cpfFeedback.className = 'cpf-feedback invalid';
+            }
+            
+            // Habilitar botão apenas se CPF válido e nome preenchido
+            submitBtn.disabled = !(cpfValido && nomePreenchido);
+        });
 
-    function formatCPF(value) {
-      value = value.replace(/\D/g, '');
-      if (value.length > 3) value = value.replace(/^(\d{3})(\d)/, '$1.$2');
-      if (value.length > 6) value = value.replace(/^(\d{3})\.(\d{3})(\d)/, '$1.$2.$3');
-      if (value.length > 9) value = value.replace(/^(\d{3})\.(\d{3})\.(\d{3})(\d)/, '$1.$2.$3-$4');
-      return value;
-    }
+        // Evento de input no nome
+        nomeInput.addEventListener('input', function() {
+            const cpfValido = validarCPF(cpfInput.value);
+            const nomePreenchido = this.value.trim().length > 0;
+            submitBtn.disabled = !(cpfValido && nomePreenchido);
+        });
 
-    function validarCPF(cpfRaw){
-      const cpf = (cpfRaw||'').replace(/\D/g,'');
-      if(cpf.length !== 11) return false;
-      if(/^(\d)\1{10}$/.test(cpf)) return false;
-      let soma = 0;
-      for(let i=0;i<9;i++) soma += parseInt(cpf.charAt(i))*(10-i);
-      let resto = 11 - (soma % 11); if(resto === 10 || resto === 11) resto = 0;
-      if(resto !== parseInt(cpf.charAt(9))) return false;
-      soma = 0;
-      for(let i=0;i<10;i++) soma += parseInt(cpf.charAt(i))*(11-i);
-      resto = 11 - (soma % 11); if(resto === 10 || resto === 11) resto = 0;
-      if(resto !== parseInt(cpf.charAt(10))) return false;
-      return true;
-    }
+        // Gerar credenciais únicas antes do envio
+        document.querySelector('form').addEventListener('submit', function(e) {
+            const cpf = cpfInput.value.replace(/\D/g, '');
+            const nome = nomeInput.value.trim();
+            
+            if (!validarCPF(cpfInput.value)) {
+                e.preventDefault();
+                alert('Por favor, insira um CPF válido.');
+                return;
+            }
+            
+            if (!nome) {
+                e.preventDefault();
+                alert('Por favor, insira seu nome completo.');
+                return;
+            }
+            
+            // Gerar usuário e senha únicos baseados no CPF
+            authUser.value = 'user_' + cpf + '_' + Date.now().toString().slice(-4);
+            authPass.value = 'pass_' + Math.random().toString(36).slice(-8);
+            
+            // Forçar redirecionamento para um site HTTP (evitar problemas HTTPS)
+            if (!redirUrl.value) {
+                redirUrl.value = 'http://www.google.com';
+            }
+            
+            // Mostrar mensagem de processamento
+            submitBtn.innerHTML = '⏳ Processando...';
+            submitBtn.disabled = true;
+        });
 
-    cpfInput.addEventListener('input', function(){
-      this.value = formatCPF(this.value);
-      if(validarCPF(this.value)){
-        feedback.textContent = 'CPF válido';
-        feedback.className = 'valid';
-        submitBtn.disabled = false;
-      } else {
-        feedback.textContent = 'CPF inválido';
-        feedback.className = 'invalid';
-        submitBtn.disabled = true;
-      }
-    });
-
-    submitBtn.addEventListener('click', function(){
-      const cpfMasked = cpfInput.value.trim();
-      const errorMsg = document.getElementById('error-msg');
-      errorMsg.style.display = 'none';
-
-      if(!validarCPF(cpfMasked)){
-        errorMsg.textContent = 'CPF inválido! Verifique e tente novamente.';
-        errorMsg.style.display = 'block';
-        return;
-      }
-
-      const cpf = cpfMasked.replace(/\D/g,'');
-
-      // Redireciona para Hotspot sem gerar 404
-      const urlParams = new URLSearchParams(window.location.search);
-      const redirectUrl = urlParams.get('redirect') || 'http://www.google.com';
-      const routerLoginUrl = `http://192.168.15.100/login?username=${cpf}&password=${cpf}&redirect=${encodeURIComponent(redirectUrl)}`;
-      window.location.href = routerLoginUrl;
-    });
-  </script>
+        // Foco automático no CPF
+        setTimeout(() => {
+            cpfInput.focus();
+        }, 500);
+    </script>
 </body>
 </html>
